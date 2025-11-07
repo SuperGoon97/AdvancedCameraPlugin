@@ -3,7 +3,7 @@ Advanced camera plugin for godot 4.5.1
 
 ########################################\
 		INSTALLATION\
-########################################\
+########################################
 
 Drag and drop the addons folder into your res:// folder of your project
 
@@ -15,6 +15,6 @@ reload the current project
 
 #######################################\
 		HOW TO USE\
-#######################################\
+#######################################
 
 Watch the tutorial video at 
