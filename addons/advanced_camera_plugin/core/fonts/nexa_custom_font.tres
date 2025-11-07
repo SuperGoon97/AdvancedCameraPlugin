@@ -1,0 +1,6 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://bjjjveokm6q3j"]
+
+[ext_resource type="FontFile" uid="uid://ee6v7vvejn28" path="res://addons/advanced_camera_plugin/core/fonts/Nexa-Heavy.ttf" id="1_k1o6r"]
+
+[resource]
+base_font = ExtResource("1_k1o6r")
