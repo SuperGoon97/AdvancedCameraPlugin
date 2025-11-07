@@ -29,7 +29,7 @@ signal camera_shake_complete
 ## Property holds the current camera tween
 var current_tween:Tween
 ## Bool tracks if the camera has been given a movement command
-var camera_moving_to:bool = false
+var can_move_to_target:bool = true
 ## Bool temp tracks if target has changed
 var camera_target_changed:bool = false
 ## Camera distance tolerance, the larger this is the more distance the camera can be from a point before it acknowledges it has arrived
@@ -115,7 +115,7 @@ func _physics_process(delta: float) -> void:
 
 ## Match statement to decide which follow type is in use
 func follow_target(delta: float):
-	if camera_moving_to == false:
+	if can_move_to_target == true:
 		match camera_follow_type:
 			G_Advanced_Cam.FOLLOW_TYPE.SNAP:
 				_snap_to_target()
@@ -152,7 +152,6 @@ func _lag_to_target(delta:float ,speed_modifier:float = 100.0):
 ## Tweens the camera to target [Node2D], if no target provided to method defaults to camera default target
 func tween_to_target(target:Node2D = camera_default_target,time_to_reach_target:float = 0.5,tween_easing_type:Tween.EaseType = Tween.EaseType.EASE_IN): 
 	_kill_tween()
-	camera_moving_to = true
 	current_tween = get_tree().create_tween()
 	var tween_target:Node2D = target
 	if !target:
@@ -161,18 +160,15 @@ func tween_to_target(target:Node2D = camera_default_target,time_to_reach_target:
 	current_tween.tween_property(self,"global_position",tween_target.global_position,time_to_reach_target)
 	await current_tween.finished
 	camera_arrived_at_target.emit(target)
-	camera_moving_to = false
 
 ## Tweens the camera to target position [Vector2] 
 func tween_to_target_position(pos:Vector2,time_to_reach_target:float = 0.5,tween_easing_type:Tween.EaseType = Tween.EaseType.EASE_IN):
 	_kill_tween()
-	camera_moving_to = true
 	current_tween = get_tree().create_tween()
 	current_tween.set_ease(tween_easing_type)
 	current_tween.tween_property(self,"global_position",pos,time_to_reach_target)
 	await current_tween.finished
 	camera_arrived_at_pos.emit()
-	camera_moving_to = false
 
 ## Forces camera to target Node2D
 func force_to_target(target:Node2D = camera_target):
@@ -190,6 +186,9 @@ func _kill_tween():
 		if current_tween.is_running():
 			current_tween.kill()
 
+func camera_can_move_to_target_state(state:bool):
+	can_move_to_target = state
+
 ## Resets camera focusing back on the default target
 func camera_to_default():
 	camera_target = camera_default_target
@@ -197,7 +196,7 @@ func camera_to_default():
 	camera_follow_type = camera_default_follow_type
 	camera_lag_elastic = camera_default_lag_elastic
 	_kill_tween()
-	camera_moving_to = false
+	camera_can_move_to_target_state(true)
 
 ## Calculates the direction from camera to target
 func _calculate_direction() -> Vector2:

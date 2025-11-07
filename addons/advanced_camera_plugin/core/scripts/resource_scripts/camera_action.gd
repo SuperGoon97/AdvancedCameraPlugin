@@ -10,6 +10,8 @@ signal request_color_change(_color:Color)
 @export_custom(PROPERTY_HINT_RANGE,"0.0,3.0,0.05,or_greater,suffix:s") var pre_wait:float = 0.0
 ## Time to wait after executing this camera action in seconds
 @export_custom(PROPERTY_HINT_RANGE,"0.0,3.0,0.05,or_greater,suffix:s") var post_wait:float = 0.0
+## Use this bool to cause the action to emit [signal G_Advanced_Cam.camera_action_lock_player]
+@export var lock_player:bool = false
 ## Hold the camera after this action until the [signal G_Advanced_Cam.move_camera_on] is emitted
 @export var hold_camera_until_move_camera_on_emitted : bool = false
 ## Icon to draw

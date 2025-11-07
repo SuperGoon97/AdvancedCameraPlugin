@@ -55,13 +55,10 @@ func setup_build_lines():
 		target.setup()
 
 func _on_area_entered(area: Area2D) -> void:
-	print(area.name)
-	print(area.get_parent().name)
 	if is_player_area: return
 	if has_activated == false:
 		var advanced_camera_area_2d := area as AdvancedCameraArea2D
 		if advanced_camera_area_2d and area.is_player_area:
-			print("player entered area " + name)
 			if area_targets.size() > 0:
 				await execute_camera_area_targets()
 				set_other_tarets_active()
@@ -85,7 +82,6 @@ func set_is_active(state:bool):
 		if !Engine.is_editor_hint():
 			if is_node_ready():
 				await get_tree().create_timer(activation_time).timeout
-				print(name + " has been activated")
 				set_deferred("monitoring",state)
 				set_deferred("monitorable",state)
 	else:
@@ -93,6 +89,5 @@ func set_is_active(state:bool):
 		set_deferred("monitorable",state)
 
 func set_other_tarets_active():
-	print("set other targets called")
 	for area in other_area_active_state:
 		area.set_is_active(other_area_active_state[area])

@@ -4,9 +4,6 @@ class_name AdvancedCameraTarget extends Node2D
 ## Emitted when the camera has arrived this target
 @warning_ignore("unused_signal")
 signal all_actions_complete
-@warning_ignore("unused_signal")
-signal camera_at_target
-signal draw_camera_icon_changed(state:bool)
 
 const NEXA_CUSTOM_FONT = preload("res://addons/advanced_camera_plugin/core/fonts/nexa_custom_font.tres")
 
@@ -25,17 +22,11 @@ const NEXA_CUSTOM_FONT = preload("res://addons/advanced_camera_plugin/core/fonts
 @export var _draw_viewport_rect:bool = true
 ## Toggle if the bounds rect is drawn, only works if a bounds rect is present
 @export var _draw_bounds:bool = true
-@export var _draw_camera_icon:bool = true:
-	get:
-		return _draw_camera_icon
-	set(value):
-		draw_camera_icon_changed.emit(value)
-		_draw_camera_icon = value
 @export var _draw_color:Color = Color.WHITE:
 	set(value):
 		_draw_color = value
 		if line2d:
-			line2d.self_modulate = _draw_color
+			line2d.color = _draw_color
 
 var camera_line:ToolLine2D
 var one_over_camera_zoom:Vector2
@@ -93,12 +84,11 @@ func setup():
 	camera_line = ToolLine2D.new()
 	add_child(camera_line)
 	line2d = camera_line
+	line2d.color = _draw_color
 	camera_line.width = 2.0
 	camera_line.global_position = Vector2(0,0)
 	camera_line.add_point(global_position,0)
 	camera_line.add_point(target_parent.global_position,1)
-	for child in get_children():
-		child.set("self_modulate",self_modulate)
 
 func setup_camera_actions():
 	has_zoom_action = false
@@ -123,7 +113,6 @@ func setup_camera_actions():
 		add_child(new_acsprite2d)
 		new_acsprite2d.name = action.get_script().get_global_name()
 		new_acsprite2d.position = Vector2(spacing * (1.0 - n / 2.0 + i),0.0)
-		new_acsprite2d.set_owner(get_tree().edited_scene_root)
 		action.request_icon.connect(new_acsprite2d.set_icon)
 		action.request_icon_visibility_change.connect(new_acsprite2d.set_visibilty)
 		action.request_color_change.connect(new_acsprite2d.set_color)
@@ -147,6 +136,7 @@ func execute_actions():
 	for action in camera_actions:
 		if action.pre_wait > 0.0:
 			await get_tree().create_timer(action.pre_wait).timeout
+		G_Advanced_Cam.camera_action_lock_player.emit(action.lock_player)
 		match action.action_function:
 			G_Advanced_Cam.CAMERA_ACTION.MOVE_TO:
 				G_Advanced_Cam._move_to(target_node,action)
@@ -162,11 +152,15 @@ func execute_actions():
 				G_Advanced_Cam._stay_in_area(target_node,action)
 			G_Advanced_Cam.CAMERA_ACTION.CLEAR_CAMERA_MULTI:
 				G_Advanced_Cam._clear_camera_multi_targets()
+			_:
+				pass
 		await G_Advanced_Cam.camera_function_complete
 		if action.hold_camera_until_move_camera_on_emitted:
 			await G_Advanced_Cam.move_camera_on
 		if action.post_wait > 0.0:
 			await get_tree().create_timer(action.post_wait).timeout
+		
+	G_Advanced_Cam.camera_can_move_to_target.emit(true)
 	all_actions_complete.emit()
 
 func update_action_icon(cam_action:CameraAction,_icon:CompressedTexture2D):

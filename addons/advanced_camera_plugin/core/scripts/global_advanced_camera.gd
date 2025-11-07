@@ -4,6 +4,8 @@ extends Node
 signal camera_function_complete
 @warning_ignore("unused_signal")
 signal move_camera_on
+signal camera_can_move_to_target(state:bool)
+signal camera_action_lock_player(state:bool)
 
 enum FOLLOW_TYPE{
 	## Camera follows the target setting its location every physics frame
@@ -35,6 +37,7 @@ var advanced_camera:AdvancedCamera2D:
 			print("error setting advanced camera")
 		advanced_camera = value
 		advanced_camera.camera_zoom_change_complete.connect(_camera_zoom_complete)
+		camera_can_move_to_target.connect(advanced_camera.camera_can_move_to_target_state)
 	get:
 		return advanced_camera
 
@@ -93,7 +96,8 @@ func get_camera_zoom():
 ## Sets camera bound state, if value == true the camera will be bound to the area last set in set_camera_bounds
 func set_camera_is_bound(value:bool):
 	if advanced_camera:
-		advanced_camera.set("lock_camera_to_camera_bounds",value)
+		print("set is bound = " + str(value))
+		advanced_camera.set("_lock_camera_to_camera_bounds",value)
 
 ## Gets camera bound state
 func get_camera_is_bound() -> bool:
@@ -104,6 +108,7 @@ func get_camera_is_bound() -> bool:
 ## Sets the cameras bounds
 func set_camera_bounds(bounds:PackedVector2Array):
 	if advanced_camera:
+		print("set bounds")
 		advanced_camera.set("camera_bounds",bounds)
 
 ## Gets the camera bounds
@@ -157,7 +162,6 @@ func shake_camera(strength:float = 2.0,strength_pow:float = 2.0,decay_rate:float
 func set_camera_to_default():
 	if advanced_camera:
 		advanced_camera.call("camera_to_default")
-		await get_tree().process_frame
 		camera_function_complete.emit()
 
 ## Forces the camera to a Vector2 position, camera will not stay there
@@ -200,13 +204,13 @@ func _get_temp_advanced_cam():
 func _move_to(target:Node2D,action:CameraActionMoveTo):
 	match action.move_by:
 		action.MOVE_BY.TWEEN:
+			camera_can_move_to_target.emit(false)
 			tween_camera_to_target(target,action.twn_time_to_reach_target,action.twn_tween_easing)
 		action.MOVE_BY.CHANGE_TARGET:
+			camera_can_move_to_target.emit(true)
 			set_camera_target(target)
 	if action.await_complete:
 		await advanced_camera.camera_arrived_at_target
-	target.camera_at_target.emit()
-	await get_tree().process_frame
 	camera_function_complete.emit()
 
 ## Camera target stay in area logic
@@ -223,6 +227,7 @@ func _stay_in_area(target:Node2D,action:CameraActionBounds):
 			advanced_camera.tween_to_target_position(intersection_point[0],action.twn_time_to_reach_target,action.twn_tween_easing)
 			if action.await_complete:
 				await advanced_camera.camera_arrived_at_pos
+	camera_can_move_to_target.emit(true)
 	await get_tree().process_frame
 	camera_function_complete.emit()
 
