@@ -1,9 +1,9 @@
 # AdvancedCameraPlugin
 Advanced camera plugin for godot 4.5.1
 
-########################################
-		INSTALLATION
-########################################
+########################################\
+		INSTALLATION\
+########################################\
 
 Drag and drop the addons folder into your res:// folder of your project
 
@@ -13,8 +13,8 @@ enable the plugin
 
 reload the current project 
 
-#######################################
-		HOW TO USE
-#######################################
+#######################################\
+		HOW TO USE\
+#######################################\
 
 Watch the tutorial video at 
