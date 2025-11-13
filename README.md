@@ -17,4 +17,6 @@ reload the current project
 		HOW TO USE\
 #######################################
 
-Watch the tutorial video at 
+Watch the tutorial video at https://www.youtube.com/watch?v=JfTrf3bmgcE
+
+
