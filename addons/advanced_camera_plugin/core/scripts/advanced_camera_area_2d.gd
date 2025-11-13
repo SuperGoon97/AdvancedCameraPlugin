@@ -9,11 +9,7 @@ signal player_exited_area
 @export var is_one_shot:bool = false
 
 @export_category("AreaDefaults")
-@export var other_area_active_state:Dictionary[AdvancedCameraArea2D,bool]:
-	set(value):
-		if value.has(self):
-			value.erase(self)
-		other_area_active_state = value
+@export var other_area_active_state:Array[AdvancedCameraArea2D]
 @export var is_player_area:bool = false
 @export var is_active_on_start:bool = true:
 	set(value):
@@ -84,10 +80,13 @@ func set_is_active(state:bool):
 				await get_tree().create_timer(activation_time).timeout
 				set_deferred("monitoring",state)
 				set_deferred("monitorable",state)
+		else:
+			set_deferred("monitoring",state)
+			set_deferred("monitorable",state)
 	else:
 		set_deferred("monitoring",state)
 		set_deferred("monitorable",state)
 
 func set_other_tarets_active():
 	for area in other_area_active_state:
-		area.set_is_active(other_area_active_state[area])
+		area.set_is_active(true)
