@@ -1,15 +1,17 @@
 @tool
+## [CameraAction] Extension class used to shake shake shake
 class_name CameraActionShake extends CameraAction
 
 const ADVANCED_CAMERA_VIBRATE_ICON = preload("res://addons/advanced_camera_plugin/icons/advanced_camera_vibrate_icon.png")
 
-
+## Method of shake
 enum SHAKE_MODE{
 	## Adds strength to the current camera shake strength
 	ADD,
 	## Sets the cameras shake strength
 	SET,
 }
+## Bool will cause an indefinite shake to stop if currently active
 @export var stop_shake:bool = false
 ## Amplitude is the base for the shake
 @export_range(0.0,100.0,1.0,"or_greater") var amplitude:float = 40.0

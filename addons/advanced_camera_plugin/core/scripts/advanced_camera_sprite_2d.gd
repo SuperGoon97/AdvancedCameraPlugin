@@ -1,16 +1,18 @@
 @tool
+## [Sprite2D] extension class that is specialised for displaying [CameraAction] infomation
 class_name AdvancedCameraTargetSprite2D extends Sprite2D
-
+## Base scale for the sprite
 var base_scale:Vector2 = Vector2(0.5,0.5)
+## Viewport reference used to calculate the current zoom in the editor
 var viewport:Viewport = null
 
-
+## Icon setter
 func set_icon(icon:CompressedTexture2D):
 	texture = icon
-
+## Visibility setter
 func set_visibilty(state:bool):
 	visible = state
-
+## Color Setter
 func set_color(color:Color):
 	self_modulate = color
 
@@ -27,6 +29,7 @@ func _ready() -> void:
 	else:
 		visible = false
 
+## Updates the scale of the sprite every process frame whilst in the editor
 func update_scale():
 	if viewport == null:
 		viewport = get_viewport()

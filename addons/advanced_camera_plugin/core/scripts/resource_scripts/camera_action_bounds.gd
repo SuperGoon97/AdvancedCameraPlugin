@@ -1,14 +1,18 @@
 @tool
+## [CameraAction] Extension class used to enforce bounds for the camera
 class_name CameraActionBounds extends CameraAction
-
+## Signal emitted to request bounds changed used for [AdvancedCameraTarget]
 signal request_bounds_changed()
 
 const ADVANCED_CAMERA_BOUNDS_ICON = preload("res://addons/advanced_camera_plugin/icons/advanced_camera_bounds_icon.png")
 
-
+## Method of reaching the closest point in bounds
 enum CLOSEST_POINT_TYPE{
+	## Will not move into bounds
 	NONE,
+	## Will teleport into bounds
 	SNAP,
+	## Will perform a tween to get back into bounds
 	TWEEN,
 }
 
@@ -34,18 +38,22 @@ enum CLOSEST_POINT_TYPE{
 	set(value):
 		west_bound = value
 		_bounds_changed()
+## Enum for move to bounds type [enum CLOSEST_POINT_TYPE]
 @export var move_camera_to_closest_point:CLOSEST_POINT_TYPE = CLOSEST_POINT_TYPE.NONE
+## Bool determines if the action must be complete before the next action attemps to execute
 @export var await_complete:bool = true
 @export_group("Tween","twn_")
+## If [enum CLOSEST_POINT_TYPE.TWEEN] this will control the time it takes to reach the target within bounds
 @export var twn_time_to_reach_target:float = 0.5
+## Controls the tween easing type used defaults to [Tween.EaseType.EASE_IN_OUT]
 @export var twn_tween_easing:Tween.EaseType = Tween.EaseType.EASE_IN_OUT
 
 func _init() -> void:
 	action_function = G_Advanced_Cam.CAMERA_ACTION.STAY_IN_AREA
 	icon = ADVANCED_CAMERA_BOUNDS_ICON.duplicate()
-
+## Method calls signal to change drawn bounds size
 func _bounds_changed():
 	request_bounds_changed.emit()
-
+## Method creates the [PackedVector2Array] and returns it 
 func get_bounds() -> PackedVector2Array:
 	return PackedVector2Array([Vector2(east_bound,-north_bound),Vector2(east_bound,south_bound),Vector2(-west_bound,-north_bound),Vector2(-west_bound,south_bound)])

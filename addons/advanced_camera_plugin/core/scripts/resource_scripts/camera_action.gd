@@ -1,8 +1,11 @@
 @tool
+## [Resource] extension class that holds base data useful for camera related actions
 class_name CameraAction extends Resource
-
+## Signal used by icon setter, tells [AdvancedCameraTarget] to change [AdvancedCameraTargetSprite2D] icon
 signal request_icon(_icon:CompressedTexture2D)
+## Signal used by visibility setter, tells [AdvancedCameraTarget] to change [AdvancedCameraTargetSprite2D] icon visibility
 signal request_icon_visibility_change(state:bool)
+## Signal used by color setter, tells [AdvancedCameraTarget] to change [AdvancedCameraTargetSprite2D] color
 signal request_color_change(_color:Color)
 
 @export_group("Defaults")
@@ -30,8 +33,10 @@ signal request_color_change(_color:Color)
 		draw_color = value
 		request_color_change.emit(draw_color)
 
+## Private enum used by [G_Advanced_Cam] to determine what to do with the action
 var action_function:G_Advanced_Cam.CAMERA_ACTION
 
+## Method is invoked from [AdvancedCameraTarget] on resource creation to give [AdvancedCameraTargetSprite2D] required information
 func setup():
 	if icon:
 		request_icon.emit(icon)

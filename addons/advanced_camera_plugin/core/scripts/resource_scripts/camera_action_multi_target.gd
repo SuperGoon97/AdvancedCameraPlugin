@@ -1,12 +1,14 @@
 @tool 
+## [CameraAction] Extension class used to add or remove targets from the camera multi target array
 class_name CameraActionMultiTarget extends CameraAction
 
 const ADVANCED_CAMERA_MULTI_ICON = preload("res://addons/advanced_camera_plugin/icons/advanced_camera_multi_icon.png")
 
+## Type of multi target camera action this is
 enum MULTI_TARGET_MODE{
 	## Adds this target to current camera multi targets
 	ADD,
-	## Sets the cameras multi target dict to this
+	## Removes this target from the camera multi targets
 	REMOVE,
 }
 

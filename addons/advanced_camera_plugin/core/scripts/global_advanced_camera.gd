@@ -1,12 +1,17 @@
 @tool
+## Holds alot of Setters and Getters for interfacing with the [AdvancedCamera2D], Go through this class if you want to get the camera to do things safely
 extends Node
-
+## Emits when the camera has completed a given task such as movement to a point
 signal camera_function_complete
+## Call this signal from other classes to get the camera to move on when held indefinitely via [member CameraAction.hold_camera_until_move_camera_on_emitted]
 @warning_ignore("unused_signal")
 signal move_camera_on
+## Signals to the camera that it can move towards its target again
 signal camera_can_move_to_target(state:bool)
+## Bind to this signal to lock the player when [CameraAction] lock player is used
 signal camera_action_lock_player(state:bool)
 
+## Camera follow types
 enum FOLLOW_TYPE{
 	## Camera follows the target setting its location every physics frame
 	SNAP,
@@ -14,6 +19,7 @@ enum FOLLOW_TYPE{
 	LAG,
 }
 
+## Camera action types
 enum CAMERA_ACTION{
 	## Direcects camera to move to a position
 	MOVE_TO,
@@ -30,19 +36,18 @@ enum CAMERA_ACTION{
 	## Clears the camera multi targets
 	CLEAR_CAMERA_MULTI,
 }
-
+## SetGet for [member advanced_camera]
 var advanced_camera:AdvancedCamera2D:
 	set(value):
 		if value == null:
 			print("error setting advanced camera")
 		advanced_camera = value
-		advanced_camera.camera_zoom_change_complete.connect(_camera_zoom_complete)
 		camera_can_move_to_target.connect(advanced_camera.camera_can_move_to_target_state)
 	get:
 		return advanced_camera
-
+## Private [AdvancedCamera2D] member used when @tool needs a reference
 var temp_advanced_camera:AdvancedCamera2D
-var camera_zoom_complete:bool = true
+
 
 ## Sets the camera follow type
 func set_camera_follow_type(type:FOLLOW_TYPE):
@@ -96,7 +101,6 @@ func get_camera_zoom():
 ## Sets camera bound state, if value == true the camera will be bound to the area last set in set_camera_bounds
 func set_camera_is_bound(value:bool):
 	if advanced_camera:
-		print("set is bound = " + str(value))
 		advanced_camera.set("_lock_camera_to_camera_bounds",value)
 
 ## Gets camera bound state
@@ -108,7 +112,6 @@ func get_camera_is_bound() -> bool:
 ## Sets the cameras bounds
 func set_camera_bounds(bounds:PackedVector2Array):
 	if advanced_camera:
-		print("set bounds")
 		advanced_camera.set("camera_bounds",bounds)
 
 ## Gets the camera bounds
@@ -132,7 +135,7 @@ func get_camera_multi_target_mode() -> bool:
 func add_camera_multi_targets(target:Node2D,weight:float):
 	if advanced_camera:
 		advanced_camera.add_camera_multi_target(target,weight)
-
+## Removes a specific target from the camera multi target dict
 func remove_camera_multi_target(target:Node2D):
 	if advanced_camera:
 		advanced_camera.remove_camera_multi_target(target)
@@ -169,13 +172,16 @@ func force_camera_to_vector(vec:Vector2):
 	if advanced_camera:
 		advanced_camera.call("force_to_vector",vec)
 
+## Converts bounds local space to global space 
 func make_global_bounds(g_pos:Vector2,bounds:PackedVector2Array) -> PackedVector2Array:
 	var return_packed_array:PackedVector2Array
 	for vector in bounds:
 		var global_vec = Vector2(vector.x + g_pos.x,vector.y + g_pos.y)
 		return_packed_array.append(global_vec)
+	return_packed_array.append(g_pos)
 	return return_packed_array
 
+## Gets the closest point with bounds to the target [Node2D]
 func get_closest_point_within_bounds(target:Node2D,action:CameraActionBounds) -> PackedVector2Array:
 	var cam_pos = get_camera_target().global_position
 	var g_bounds:PackedVector2Array = make_global_bounds(target.global_position,action.get_bounds())
@@ -255,15 +261,14 @@ func _shake(action:CameraActionShake):
 	await get_tree().process_frame
 	camera_function_complete.emit()
 
+## Calls the camera change zoom method
 func _zoom(action:CameraActionZoom):
 	advanced_camera.change_camera_zoom(action.camera_zoom_at_target,action.zoom_type,action.time_to_reach_zoom)
 	if action.await_complete:
 		await advanced_camera.camera_zoom_change_complete
 	camera_function_complete.emit.call_deferred()
 
-func _camera_zoom_complete():
-	camera_zoom_complete = true
-
+## Clears the cameras multi targets, readds the default target
 func _clear_camera_multi_targets():
 	advanced_camera.clear_camera_multi_targets()
 	await get_tree().process_frame

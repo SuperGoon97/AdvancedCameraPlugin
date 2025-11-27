@@ -136,11 +136,18 @@ func _lag_to_target(delta:float ,speed_modifier:float = 100.0):
 	var distance:float = _calculate_distance()
 	var rubber_banding:float = distance/camera_lag_elastic
 	if _lock_camera_to_camera_bounds:
+		var target_distance_to_bounds:float = camera_target.global_position.distance_to(camera_bounds[4])
+
 		if _check_position_within_bounds(global_position +((direction * speed_modifier * rubber_banding) * delta)):
 			global_position += (direction * speed_modifier * rubber_banding) * delta
+		elif distance > target_distance_to_bounds:
+			#print("camera oob next position is closer")
+			global_position += (direction * speed_modifier * rubber_banding) * delta
 		elif _check_position_within_x_bounds(Vector2(global_position.x +((direction.x * speed_modifier * rubber_banding) * delta),global_position.y)):
+			#print("camera oob next x is closer")
 			global_position.x += (direction.x * speed_modifier * rubber_banding) * delta
 		elif _check_position_within_y_bounds(Vector2(global_position.x,global_position.y+((direction.y * speed_modifier * rubber_banding) * delta))):
+			#print("camera oob next y is closer")
 			global_position.y += (direction.y * speed_modifier * rubber_banding) * delta
 	else:
 		global_position += (direction * speed_modifier * rubber_banding) * delta
@@ -186,6 +193,7 @@ func _kill_tween():
 		if current_tween.is_running():
 			current_tween.kill()
 
+## Changes state of camera_can_move_to_target
 func camera_can_move_to_target_state(state:bool):
 	can_move_to_target = state
 
@@ -208,12 +216,12 @@ func _calculate_direction() -> Vector2:
 	return ret_direction
 
 ## Calculates the distance from camera to target
-func _calculate_distance() -> float:
+func _calculate_distance(calc_position:Vector2 = global_position) -> float:
 	var ret_distance:float
 	if !camera_use_multi_target:
-		ret_distance = global_position.distance_to(camera_target.global_position)
+		ret_distance = calc_position.distance_to(camera_target.global_position)
 	elif camera_use_multi_target:
-		ret_distance = global_position.distance_to(_calculate_multi_target_point())
+		ret_distance = calc_position.distance_to(_calculate_multi_target_point())
 	return ret_distance
 
 ## Simple summ function

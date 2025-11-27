@@ -1,4 +1,5 @@
 @tool
+## [CameraAction] Extension class used set all camera settings to default camera settings 
 class_name CameraActionRelease extends CameraAction
 
 const ADVANCED_CAMERA_ICON = preload("res://addons/advanced_camera_plugin/icons/advanced_camera_icon.png")

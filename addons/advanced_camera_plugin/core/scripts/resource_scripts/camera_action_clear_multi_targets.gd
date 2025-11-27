@@ -1,4 +1,5 @@
 @tool 
+## [CameraAction] Extension class used to clear all multi targets then readd the default target
 class_name CameraActionClearMultiTargets extends CameraAction
 
 const ADVANCED_CAMERA_MULTI_ICON = preload("res://addons/advanced_camera_plugin/icons/advanced_camera_multi_icon.png")
